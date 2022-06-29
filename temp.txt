@@ -1,0 +1,2 @@
+xxxxxxxxxxxxxxxxxxx := 7 read x write :=
+procedure

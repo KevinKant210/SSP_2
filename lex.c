@@ -1,6 +1,10 @@
-// Caitlin Fabian and Kevin Kant
-// Hw2
-
+/*
+Authors:
+    Caitlin Fabian
+    Kevin Kant
+Lexical Analyzer
+Due: 06/25/2022
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,10 +17,11 @@
 #define true 1
 #define iscomment -1
 
+//different type of errors we can run into
 typedef enum error_type{
     none = -2, no_letter_on_start = -3,long_number = -4, invalid_symbol = -5, comment_error = -6,too_long_identifier = -7 } error_type;
 
-
+// all the types the tokens can be
 typedef enum token_type { elsesym  =  1,  identsym  =  2,  numbersym  =  3,  plussym  =  4,  minussym  =  5,  multsym  =  6,  
 slashsym = 7, modsym = 8,  eqlsym = 9, neqsym = 10, lessym = 11, leqsym = 12, 
 gtrsym = 13, geqsym = 14, lparentsym = 15, rparentsym = 16, commasym = 17, 
@@ -38,47 +43,39 @@ typedef struct lexeme{
 
 
 
-int isValidNextSym(char c){
-    if(isspace(c) || isalpha(c) || isdigit(c) || c == EOF){
-        return true;
-    }else{
-        return false;
-    }
-}
+
 
 int isSpecialSymbol(char c,char next,lexeme* token){
-
+    //function that determines the logic of tokenizing symbols
     if(c == '+'){
-        if(isValidNextSym(next) == true){
+        
             token->name[0] = '+';
             
             return plussym;
-        }
+        
     }
 
     
     if(c == '-'){
 
-        if(isValidNextSym(next) == true){
+        
             token->name[0] = '-';
             return minussym;
-        }
+        
     }
     
 
-    
-
     if(c == '*'){
-        if(isValidNextSym(next) == true){
+        
             token->name[0] = '*';
             return multsym;
-        }
+        
     }
 
     if(c == '/'){
         if(next == '*'){
             return iscomment;
-        }else if(isValidNextSym(next) == true){
+        }else{
             token->name[0] = '/';
             return slashsym;
         }
@@ -86,20 +83,19 @@ int isSpecialSymbol(char c,char next,lexeme* token){
     }
 
     if(c == '%'){
-        if(isValidNextSym(next) == true){
+        
             token->name[0] = '%';
             return modsym;
-        }
+        
     }
 
     if(c == '='){
-        if(isValidNextSym(next) == true){
+        
             token->name[0] = '=';
             return eqlsym;
-        }
+        
     }
 
-    
 
     if(c == '!'){
         if(next == '='){
@@ -118,10 +114,12 @@ int isSpecialSymbol(char c,char next,lexeme* token){
             token->name[1] = '=';
             return leqsym;
             
-        }if(isValidNextSym(next) == true){
-            token->name[0] = '<';
+        }else{
+             token->name[0] = '<';
             return lessym;
         }
+           
+        
         
     }
 
@@ -130,7 +128,7 @@ int isSpecialSymbol(char c,char next,lexeme* token){
             token->name[0] = '>';
             token->name[1] = '=';
             return geqsym;
-        }else if(isValidNextSym(next) == true){
+        }else{
             token->name[0] = '>';
             return gtrsym;
         }
@@ -138,38 +136,38 @@ int isSpecialSymbol(char c,char next,lexeme* token){
 
 
     if(c == '('){
-        if(isValidNextSym(next) == true){
+        
             token->name[0] = '(';
             return lparentsym;
-        }
+        
     }
 
     if(c == ')'){
-        if(isValidNextSym(next) == true){
+        
             token->name[0] = ')';
             return rparentsym;
-        }
+        
     }
 
     if(c == ','){
-        if(isValidNextSym(next) == true){
+        
             token->name[0] = ',';
             return commasym;
-        }
+        
     }
 
     if(c == ';'){
-        if(isValidNextSym(next) == true){
+        
             token->name[0] = ';';
             return semicolonsym;
-        }
+        
     }
 
     if(c == '.'){
-        if(isValidNextSym(next) == true){
+        
             token->name[0] = '.';
             return periodsym;
-        }
+        
     }
 
     if(c == ':'){
@@ -180,12 +178,14 @@ int isSpecialSymbol(char c,char next,lexeme* token){
         }
     }
 
+    token->error_type = invalid_symbol;
     return invalid_symbol;
 
     
 }
 
 void printName(lexeme token){
+    //function that just prints the char array name of the token
     for(int i = 0 ; i < strlen(token.name); i++){
         if(isspace(token.name[i]) == false ){
             printf("%c",token.name[i]);
@@ -194,6 +194,7 @@ void printName(lexeme token){
         
     }
 }
+
 
 
 int main(int argc, char* argv[]){
@@ -208,7 +209,7 @@ int main(int argc, char* argv[]){
     int tokenCounter = 0;
     while(halt == false){
 
-        //printf("in Main\n");
+        
         char c,next;
 
         lexeme newLex;
@@ -219,21 +220,23 @@ int main(int argc, char* argv[]){
         newLex.error_type = none;
         newLex.type = 0;
         c = fgetc(fp);
-        //we will fetch next and put it back if we dont use it
+        
         
 
-        //int i = 0;
+        
         if(c == EOF){
+            //end the file
             halt = true;
         }else if(isspace(c)){   
+            //ignroe this character
             continue;
         }else if(isalpha(c)){
-           // printf("in Alpha\n");
+           
             //is an identifier or a reserved word
             newLex.name[0] = c;
             int i = 1;
 
-
+            //need to buffer in the substring
             int alphaHalt = false;
             while(alphaHalt == false){
                 
@@ -266,6 +269,10 @@ int main(int argc, char* argv[]){
                     //finalize and store token
                     if(strcmp(newLex.name,"else") == 0){
                         newLex.type = elsesym;
+                    }else if(strcmp(newLex.name,"write") == 0){
+                        newLex.type = writesym;
+                    }else if(strcmp(newLex.name,"read") == 0){
+                        newLex.type = readsym;
                     }else if(strcmp(newLex.name,"begin") == 0){
                         newLex.type = beginsym;
                     }else if(strcmp(newLex.name,"end") == 0){
@@ -299,15 +306,17 @@ int main(int argc, char* argv[]){
 
 
         }else if(isdigit(c)){
+
             //must be a number
-            printf("in digit \n");
+            
             int i = 0;
 
-            newLex.name[i];
+            newLex.name[i] = c;
             i++;
             
             int numHalt = false;
 
+            //grab substring of numbers
             while(numHalt == false){
                 c = fgetc(fp);
 
@@ -329,27 +338,6 @@ int main(int argc, char* argv[]){
                         newLex.name[i] = c;
                         i++;
                     }
-                }else if(isspace(c)){
-                    //end of substring so we move on
-                    
-                    numHalt = true;
-
-                    //building the lex
-                    newLex.type = numbersym;
-
-                    //stuff to convert from value to number
-                    /*
-                    //do this to convert the character array to a value
-                    char* tempArray = (char*) malloc(sizeof(char)*(i+1));
-                    for(int j = 0 ; j < i; j++){
-                        tempArray[j] = newLex.name[j];
-                    }
-                    //store the value
-                    newLex.value = atoi(tempArray);
-                    
-                    free(tempArray);
-                    */
-
                 }else if(isalpha(c)){
                     //is a letter so we run into an error
 
@@ -359,23 +347,28 @@ int main(int argc, char* argv[]){
                     newLex.error_type = no_letter_on_start;
                     
                 }else{
-                    //must be some kind of symbol so we put it back and end this DFA
+                    //must be some kind of symbol or whitespace so we put it back and end this DFA
                     ungetc(c,fp);
+                    newLex.type = numbersym;
+
+                    sscanf(newLex.name,"%d",&(newLex.value));
+                    
                     numHalt = true;
+
                 }
             }
             
 
         }else{
             //we ran into a symbol
-            //printf("in symbol\n");
+            
             next = fgetc(fp);
 
             int output = isSpecialSymbol(c,next,&newLex);
 
             if(output < 0){
                 //then error must have occured or we ran into a comment
-                if(output = iscomment){
+                if(output == iscomment){
 
                     int commentHalt = false;
 
@@ -395,8 +388,9 @@ int main(int argc, char* argv[]){
                     }
                 }
 
-                newLex.error_type = output;
-            }else{
+                
+            }else if(newLex.error_type == none){
+                //we didnt get an error so we can just tokenize the symbol
                 if(output == neqsym || output == leqsym || output == geqsym || output == becomessym){
                     
                 }else{
@@ -407,9 +401,8 @@ int main(int argc, char* argv[]){
             }
             }
 
-
+            //add things to the token table
             tokenTable[tokenCounter] = newLex;
-
             tokenCounter++;
 
 
@@ -420,12 +413,37 @@ int main(int argc, char* argv[]){
     //we can close the filepointer we are no longer reading
     fclose(fp);
 
+    //now we just print out the token table
+    printf("Lexeme Table:\n");
+    printf("lexeme \t\ttoken type\n");
+    for(int i = 0 ; i < tokenCounter; i++){
+        if(tokenTable[i].type == 0 && tokenTable[i].error_type == none){
+            continue;
+        }else if(tokenTable[i].error_type != none){
+            if(tokenTable[i].error_type == no_letter_on_start){
+                printf("Lexical Analyzer Error: Invalid Identifier\n");
+            }else if(tokenTable[i].error_type == long_number){
+                printf("Lexical Analyzer Error: Number Length\n");
+            }else if(tokenTable[i].error_type == invalid_symbol){
+                printf("Lexical Analyzer Error: Invalid Symbol\n");
+            }else if(tokenTable[i].error_type == comment_error){
+                printf("Lexical Analyzer Error: Never-ending comment\n");
+            }else if(tokenTable[i].error_type == too_long_identifier){
+                printf("Lexical Analyzer Error: Identifier Length\n");
+            }
+        }else{
+            printf("%11s\t%d\n", tokenTable[i].name, tokenTable[i].type);
+        }
+        
+    }
+    
     //we now print out lex table output
+    printf("\nToken List:\n");
         for(int i = 0; i < tokenCounter; i++){
 
             
             if(tokenTable[i].error_type != none){
-                printf("Error: %d\n",tokenTable[i].error_type);
+                
             }else{
                 if(tokenTable[i].type == 0){
                     //this must be some whitespace or EOF that slipped through the cracks
@@ -435,22 +453,28 @@ int main(int argc, char* argv[]){
                     
                     printf("%d ", tokenTable[i].type);
                     printName(tokenTable[i]);
+                    printf(" ");
                 }else if(tokenTable[i].type == numbersym){
                     //print a number
-                    printf("Number!");
-                    printName(tokenTable[i]);
-                    printf("%d %d",tokenTable[i].value, tokenTable[i].type);
+                    
+                    //printName(tokenTable[i]);
+                    printf("%d %d ", tokenTable[i].type,tokenTable[i].value);
                 }else{
                     //reserved word or a symbol
                     //printName(tokenTable[i]);
-                    printf(" %d",tokenTable[i].type);
+                    printf("%d ",tokenTable[i].type);
                 }
                 
-                printf(" ");
+                
             }
         }
 
-        free(tokenTable);
+        //free our token table and slap on a whitespace
+        free(tokenTable);   
+
+        printf("\n");
+
+        return 0;
     }
 
     

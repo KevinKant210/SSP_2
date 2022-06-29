@@ -1,0 +1,23 @@
+var x , y ;
+const w := 8 ;
+procedure A ;
+	begin
+		if x < y then
+			read x ;
+		if x <= y then
+			write ( w + x ) ;
+		if x != y then
+			call A ;
+		if x = 8
+			while x >= y do
+				y := x * y ;
+	end ;
+begin
+	x := 21 / 7 ;
+	if odd x then
+		y := 7 % 3 ;
+	if x > y then
+		x := y - 3 ;
+	else
+		x := y + 3 ;
+end .

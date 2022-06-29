@@ -1,0 +1,13 @@
+Lexeme Table:
+lexeme		token type
+          x	2
+         :=	20
+          7	3
+       read	32
+          x	2
+      write	31
+         :=	20
+  procedure	30
+
+Token List:
+2 x 20 3 7 32 2 x 31 20 30 
